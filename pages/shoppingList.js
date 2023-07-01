@@ -3,7 +3,7 @@ import styles from '../styles/ShoppingList.module.css';
 import { UserContext } from '../lib/usercontext';
 import { ArrowPathIcon } from '@heroicons/react/20/solid';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
+import { UserContextProvider } from '../lib/usercontext';
 
 const ShoppingList = ({ items }) => {
   const { user, updateUser } = useContext(UserContext);
@@ -43,14 +43,9 @@ const ShoppingList = ({ items }) => {
     setInput(e.target.value);
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
     const userId = '6498404dfbccd7177539fab7';  // replace with the correct user ID later
-
     try {
       const response = await fetch('/api/addItem', {
         method: 'POST',
@@ -65,18 +60,13 @@ const ShoppingList = ({ items }) => {
 
       if (response.ok) {
         setShoppingList(prevList => [...prevList, input]);
-
         updateUser({ ...user, shoppingList: user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [] });
-
-
         setInput("");
       } else {
-
         throw new Error('Failed to add item');
         setInput("");
       }
     } catch (error) {
-
       console.error(`An error occurred while adding the item: ${error.message}`);
       setInput("");
     }
@@ -99,14 +89,9 @@ const ShoppingList = ({ items }) => {
 
       if (response.ok) {
         setUploadStatus('Item deleted successfully!');
-
         setShoppingList(prevList => prevList.filter(i => i !== item));
-
         updateUser({ ...user, shoppingList: user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [] });
 
-        console.log("shoppingList: " + JSON.stringify(shoppingList));
-
-        // user.shoppingList = shoppingList;
         user.save;
 
         // Display the alert here instead of using modalContent state
@@ -124,29 +109,23 @@ const ShoppingList = ({ items }) => {
     }
   };
 
-
-
   return (
     <div className={styles.container}>
-
-
-
       <div className={styles.mainContainer}>
         <div className={styles.list_container}>
           <ul className={styles.shoppingList}>
+          <UserContextProvider>
             {shoppingList.map((item, index) => (
               <li key={index} className={styles.shoppingItem}>
-                {item}
-                <div className={styles.cartControls}>
-                  <div
-                    className={styles.removeItem}
-                    onClick={() => handleDeleteItem(item)}
-                  >
-                    <TrashIcon className={styles.trashcan} />
-                  </div>
+              {item.charAt(0).toUpperCase() + item.slice(1)}
+              <div className={styles.cartControls}>
+                <div className={styles.removeItem} onClick={() => handleDeleteItem(item)}>
+                  <TrashIcon className={styles.trashcan} />
                 </div>
-              </li>
+              </div>
+            </li>
             ))}
+            </UserContextProvider>
           </ul>
         </div>
       </div>
@@ -169,8 +148,8 @@ export default ShoppingList;
 export async function getServerSideProps() {
   try {
     // Fetch the items from the MongoDB database
-    const response = await fetch('/api/users');
-    const users = response.data;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`);
+    const users = await response.json();
     const items = users.map((user) => user.shoppingList).flat();
 
     // Pass the items as props to the component

@@ -16,7 +16,6 @@ export default async function handler(req, res) {
   await cors(req, res);
 
   const userId = req.query.userId || req.query.id;
-  console.log("api/users, userId: " + userId);
 
 
   switch (req.method) {
