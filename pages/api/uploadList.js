@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   const { userId, shoppingList } = req.body;
 
-  const UserID = new ObjectId('6498404dfbccd7177539fab7');
+  const UserID = new ObjectId(userId);
 
   try {
     const user = await getUserById(UserID);

@@ -4,27 +4,29 @@ import { UserContext } from '../lib/usercontext';
 import { ArrowPathIcon } from '@heroicons/react/20/solid';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { UserContextProvider } from '../lib/usercontext';
+import { useRouter } from 'next/router';
 
 const ShoppingList = ({ items }) => {
   const { user, updateUser } = useContext(UserContext);
   const [shoppingList, setShoppingList] = useState(items || []);
   const [input, setInput] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const router = useRouter();
+  const { id } = router.query;
+
 
   const fetchShoppingList = async () => {
     try {
-      const userId = '649f02293f5c043e65c78e29';
-      // const userId = user._id;
+      const userId = id;
       if (!userId) {
-        throw new Error('User ID not found');
+        return;
       }
 
       const response = await fetch(`/api/user/${userId}`);  // fetch Mit's 
-      console.log("RESPONSE: " + JSON.stringify(response));
       if (response.ok) {
         const userData = await response.json();
         setShoppingList(userData.shoppingList || []);
-        console.log(userData)
+        console.log("userdata: " + userData)
       } else {
         throw new Error('Failed to fetch shopping list');
       }
@@ -35,7 +37,9 @@ const ShoppingList = ({ items }) => {
 
 
   useEffect(() => {
-    fetchShoppingList();
+    if (router.pathname !== '/login') {
+      fetchShoppingList();
+    }
   }, []);
 
 
@@ -45,7 +49,7 @@ const ShoppingList = ({ items }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userId = '6498404dfbccd7177539fab7';  // replace with the correct user ID later
+    const userId = id;
     try {
       const response = await fetch('/api/addItem', {
         method: 'POST',
@@ -60,7 +64,9 @@ const ShoppingList = ({ items }) => {
 
       if (response.ok) {
         setShoppingList(prevList => [...prevList, input]);
-        updateUser({ ...user, shoppingList: user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [] });
+        const updatedShoppingList = user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [];
+        updateUser({ ...user, shoppingList: updatedShoppingList });
+
         setInput("");
       } else {
         throw new Error('Failed to add item');
@@ -74,7 +80,7 @@ const ShoppingList = ({ items }) => {
 
   const handleDeleteItem = async (item) => {
     try {
-      const userId = '6498404dfbccd7177539fab7';  // replace with the correct user ID later
+      const userId = id;
 
       const response = await fetch('/api/deleteItem', {
         method: 'POST',
@@ -90,7 +96,8 @@ const ShoppingList = ({ items }) => {
       if (response.ok) {
         setUploadStatus('Item deleted successfully!');
         setShoppingList(prevList => prevList.filter(i => i !== item));
-        updateUser({ ...user, shoppingList: user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [] });
+        const updatedShoppingList = user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [];
+        updateUser({ ...user, shoppingList: updatedShoppingList });
 
         user.save;
 
@@ -114,17 +121,17 @@ const ShoppingList = ({ items }) => {
       <div className={styles.mainContainer}>
         <div className={styles.list_container}>
           <ul className={styles.shoppingList}>
-          <UserContextProvider>
-            {shoppingList.map((item, index) => (
-              <li key={index} className={styles.shoppingItem}>
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-              <div className={styles.cartControls}>
-                <div className={styles.removeItem} onClick={() => handleDeleteItem(item)}>
-                  <TrashIcon className={styles.trashcan} />
-                </div>
-              </div>
-            </li>
-            ))}
+            <UserContextProvider>
+              {shoppingList.map((item, index) => (
+                <li key={index} className={styles.shoppingItem}>
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                  <div className={styles.cartControls}>
+                    <div className={styles.removeItem} onClick={() => handleDeleteItem(item)}>
+                      <TrashIcon className={styles.trashcan} />
+                    </div>
+                  </div>
+                </li>
+              ))}
             </UserContextProvider>
           </ul>
         </div>
@@ -142,8 +149,6 @@ const ShoppingList = ({ items }) => {
 }
 
 export default ShoppingList;
-
-
 
 export async function getServerSideProps() {
   try {

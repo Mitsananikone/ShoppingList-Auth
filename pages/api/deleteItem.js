@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   // Convert userId to ObjectId
-  const userIdObj = new mongoose.Types.ObjectId('649f02293f5c043e65c78e29');
+  const userIdObj = new mongoose.Types.ObjectId(userId);
 
   try {
     await connectToDatabase();
