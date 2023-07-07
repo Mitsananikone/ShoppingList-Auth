@@ -1,23 +1,15 @@
 import React, { useContext, useEffect } from 'react';
 import { connectToDatabase } from '../lib/mongodb';
-import { UserContext, UserContextProvider } from '../lib/usercontext';
 import Login from './login';
 import ShoppingList from './shoppingList';
 require('dotenv').config();
 
 export default function App({ users }) {
-  const { user } = useContext(UserContext);
-
-  useEffect(() => {
-    console.log('Index user:', user); // Log the user to the console
-  }, [user]);
 
   return (
     <div className="root" style={{width: '100%'}}>
-      <UserContextProvider>
         <Login/>
         <ShoppingList/>
-      </UserContextProvider>
     </div>
   );
 }

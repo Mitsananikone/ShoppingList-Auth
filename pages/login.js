@@ -1,67 +1,82 @@
-import React, { useContext } from 'react';
-import { UserContext } from '../lib/usercontext';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../redux/slices/userSlice';
 import styles from '../styles/Login.module.css';
 import { useRouter } from 'next/router';
-import ShoppingList from './shoppingList';
 
-export default function Login() {
+const Login = () => {
+  const dispatch = useDispatch();
   const Router = useRouter();
-  const { user, updateUser } = useContext(UserContext);
 
-  const userCredentials = {
-    users: [
-      {
-        _id: '64a03e5f0aa1e53602449dc9',
-        name: 'Dad',
-        email: 'dad@dad.com',
-        password: 'dddddddd',
-        shoppingList: []
-      },
-      {
-        _id: '64a03e6a0aa1e53602449dcb',
-        name: 'Mom',
-        email: 'mom@mom.com',
-        password: 'mmmmmmmm',
-        shoppingList: []
-      },
-      {
-        _id: '64a03e720aa1e53602449dcd',
-        name: 'Tim',
-        email: 'tim@tim.com',
-        password: 'tttttttt',
-        shoppingList: []
-      },
-      {
-        _id: '64a03e7b0aa1e53602449dcf',
-        name: 'Mit',
-        email: 'mit@mit.com',
-        password: 'mmmmmmmm',
-        shoppingList: []
-      }
-    ]
-  };
+  const userCredentials = [
+    {
+      _id: '64a6fd13a623eb745e1673c5',
+      name: 'Dad',
+      email: 'dad@dad.com',
+      password: 'dddddddd',
+      shoppingList: [],
+      color: 'orangered' // Add color property to each user
+    },
+    {
+      _id: '64a6fd05a623eb745e1673c3',
+      name: 'Mom',
+      email: 'mom@mom.com',
+      password: 'mmmmmmmm',
+      shoppingList: [],
+      color: 'limegreen' // Add color property to each user
+    },
+    {
+      _id: '64a6fd1fa623eb745e1673c7',
+      name: 'Tim',
+      email: 'tim@tim.com',
+      password: 'tttttttt',
+      shoppingList: [],
+      color: 'cornflowerblue' // Add color property to each user
+    },
+    {
+      _id: '64a6fd28a623eb745e1673c9',
+      name: 'Mit',
+      email: 'mit@mit.com',
+      password: 'mmmmmmmm',
+      shoppingList: [],
+      color: 'gold' // Add color property to each user
+    }
+  ];
 
   const handleLogin = (event) => {
-    const clickedUser = userCredentials.users.find(user => user.name.toLowerCase() === event.target.id);
+    const clickedUser = userCredentials.find(
+      (user) => user.name.toLowerCase() === event.currentTarget.id
+    );
     if (clickedUser) {
-      updateUser(clickedUser);
+      dispatch(updateUser(clickedUser));
       Router.push({
         pathname: '/shoppingList',
         query: { id: clickedUser._id },
       });
     }
   };
-  
 
   return (
-    <div>
-        <div className={styles.container}>
-          <h1>Login</h1>
-          <button id="dad" onClick={handleLogin}>Dad</button>
-          <button id="mom" onClick={handleLogin}>Mom</button>
-          <button id="tim" onClick={handleLogin}>Tim</button>
-          <button id="mit" onClick={handleLogin}>Mit</button>
-        </div>
+    <div className={styles.profile_container}>
+      <h1>LOGIN</h1>
+      <div className={styles.profileDad} id="dad" onClick={handleLogin}>
+        <img src="/images/dad.jpg" alt="Dad's profile picture" />
+        <span>Dad</span>
+      </div>
+      <div className={styles.profileMom} id="mom" onClick={handleLogin}>
+        <img src="/images/mom.jpg" alt="Mom's profile picture" />
+        <span>Mom</span>
+      </div>
+      <div className={styles.profileTim} id="tim" onClick={handleLogin}>
+        <img src="/images/tim.jpg" alt="Tim's profile picture" />
+        <span>Tim</span>
+      </div>
+      <div className={styles.profileMit} id="mit" onClick={handleLogin}>
+        <img src="/images/mit.jpg" alt="Mit's profile picture" />
+        <span>Mit</span>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;

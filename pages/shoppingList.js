@@ -1,18 +1,19 @@
 import { useState, useContext, useEffect } from 'react';
 import styles from '../styles/ShoppingList.module.css';
-import { UserContext } from '../lib/usercontext';
 import { ArrowPathIcon } from '@heroicons/react/20/solid';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import { UserContextProvider } from '../lib/usercontext';
 import { useRouter } from 'next/router';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUser } from '../redux/slices/userSlice';
 
 const ShoppingList = ({ items }) => {
-  const { user, updateUser } = useContext(UserContext);
+  const user = useSelector((state) => state.user.user);
   const [shoppingList, setShoppingList] = useState(items || []);
   const [input, setInput] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
   const router = useRouter();
   const { id } = router.query;
+  const dispatch = useDispatch();
 
 
   const fetchShoppingList = async () => {
@@ -97,7 +98,8 @@ const ShoppingList = ({ items }) => {
         setUploadStatus('Item deleted successfully!');
         setShoppingList(prevList => prevList.filter(i => i !== item));
         const updatedShoppingList = user && user.shoppingList ? user.shoppingList.filter(i => i !== input) : [];
-        updateUser({ ...user, shoppingList: updatedShoppingList });
+        dispatch(updateUser({ ...user, shoppingList: updatedShoppingList }));
+  
 
         user.save;
 
@@ -121,7 +123,6 @@ const ShoppingList = ({ items }) => {
       <div className={styles.mainContainer}>
         <div className={styles.list_container}>
           <ul className={styles.shoppingList}>
-            <UserContextProvider>
               {shoppingList.map((item, index) => (
                 <li key={index} className={styles.shoppingItem}>
                   {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -132,7 +133,6 @@ const ShoppingList = ({ items }) => {
                   </div>
                 </li>
               ))}
-            </UserContextProvider>
           </ul>
         </div>
       </div>

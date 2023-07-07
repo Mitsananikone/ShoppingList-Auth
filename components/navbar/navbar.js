@@ -1,13 +1,11 @@
 'use client';
 import React, { useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { UserContext } from '../../lib/usercontext';
 import { useRouter } from 'next/router';
 import styles from './navbar.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function SignButton() {
-  const { user, setUser } = useContext(UserContext);
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -50,7 +48,6 @@ function SignButton() {
 }
 
 export default function NavBar() {
-  const { user } = useContext(UserContext);
   const router = useRouter();
   const isLoginPage = router.pathname === '/login';
 
